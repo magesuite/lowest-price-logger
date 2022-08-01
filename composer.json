@@ -1,0 +1,15 @@
+{
+    "name": "creativestyle/magesuite-lowest-price-logger",
+    "description": "",
+    "license": "OSL-3.0",
+    "type": "magento2-module",
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "MageSuite\\LowestPriceLogger\\": ""
+        }
+    }
+}
+
