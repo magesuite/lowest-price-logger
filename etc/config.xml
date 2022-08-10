@@ -11,7 +11,7 @@
             </cron>
             <cleanup_cron>
                 <enabled>1</enabled>
-                <schedule_expression>30 1 * *</schedule_expression>
+                <schedule_expression>30 1 * * *</schedule_expression>
                 <retention_period_in_days>30</retention_period_in_days>
             </cleanup_cron>
     </lowest_price_logger>
