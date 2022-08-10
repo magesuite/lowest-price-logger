@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <lowest_price_logger>
+            <processing>
+                <batch_size>1000</batch_size>
+            </processing>
+            <cron>
+                <enabled>1</enabled>
+                <schedule_expression>30 3 * * *</schedule_expression>
+            </cron>
+            <cleanup_cron>
+                <enabled>1</enabled>
+                <schedule_expression>30 1 * *</schedule_expression>
+                <retention_period_in_days>30</retention_period_in_days>
+            </cleanup_cron>
+    </lowest_price_logger>
+    </default>
+</config>
