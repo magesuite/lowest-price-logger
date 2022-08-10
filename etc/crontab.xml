@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="default">
+        <job name="log_prices" instance="MageSuite\LowestPriceLogger\Cron\LogPrices" method="execute">
+            <config_path>lowest_price_logger/cron/schedule_expression</config_path>
+        </job>
+        <job name="cleanup_price_history_log" instance="MageSuite\LowestPriceLogger\Cron\LogsCleanup" method="execute">
+            <config_path>lowest_price_logger/cleanup_cron/schedule_expression</config_path>
+        </job>
+    </group>
+</config>

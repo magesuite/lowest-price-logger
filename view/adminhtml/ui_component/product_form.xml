@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <fieldset name="price_history_log">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="collapsible" xsi:type="boolean">true</item>
+                <item name="label" xsi:type="string" translate="true">Price History Log</item>
+                <item name="sortOrder" xsi:type="number">20</item>
+                <item name="additionalClasses" xsi:type="string">cs-csfeature__logo</item>
+            </item>
+        </argument>
+        <insertListing name="price_history_log_listing_insert">
+            <settings>
+                <dataLinks>
+                    <exports>false</exports>
+                    <imports>true</imports>
+                </dataLinks>
+                <externalProvider>price_history_log_listing.price_history_log_listing_data_source</externalProvider>
+                <autoRender>true</autoRender>
+                <ns>price_history_log_listing</ns>
+                <exports>
+                    <link name="product_id">${ $.externalProvider }:params.current_product_id</link>
+                    <link name="store_id">${ $.externalProvider }:params.current_store_id</link>
+                </exports>
+                <imports>
+                    <link name="product_id">${ $.provider }:data.product.current_product_id</link>
+                    <link name="store_id">${ $.provider }:data.product.current_store_id</link>
+                </imports>
+            </settings>
+        </insertListing>
+    </fieldset>
+</form>
