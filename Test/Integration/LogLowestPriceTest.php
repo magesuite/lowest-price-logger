@@ -130,6 +130,13 @@ class LogLowestPriceTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('2022-08-02', $priceHistory[0]['log_date']);
         $this->assertEquals(8.50, $priceHistory[1]['price']);
         $this->assertEquals('2022-08-02', $priceHistory[1]['log_date']);
+
+        $priceHistory = $this->priceHistoryLog->getPriceHistory([$product->getId()], $this->getSecondWebsiteId(), 0);
+
+        $this->assertEquals(10, $priceHistory[0]['price']);
+        $this->assertEquals('2022-08-02', $priceHistory[0]['log_date']);
+        $this->assertEquals(8.50, $priceHistory[1]['price']);
+        $this->assertEquals('2022-08-02', $priceHistory[1]['log_date']);
     }
 
     public function tearDown(): void
