@@ -10,6 +10,8 @@ class AddPriceHistoryToCollectionTest extends \PHPUnit\Framework\TestCase
     protected ?\Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory;
     protected ?\MageSuite\LowestPriceLogger\Model\AddPriceHistoryToCollection $addPriceHistoryToCollection;
     protected ?\Magento\Catalog\Api\ProductRepositoryInterface $productRepository;
+    protected ?\Magento\Store\Model\StoreManagerInterface $storeManager;
+    protected ?\MageSuite\LowestPriceLogger\Model\ResourceModel\PriceHistoryLog $priceHistoryLog;
 
     public function setUp(): void
     {
@@ -24,6 +26,10 @@ class AddPriceHistoryToCollectionTest extends \PHPUnit\Framework\TestCase
         $this->productRepository = $this->objectManager->create(\Magento\Catalog\Api\ProductRepositoryInterface::class);
         $this->productCollectionFactory = $this->objectManager->create(\Magento\Catalog\Model\ResourceModel\Product\CollectionFactory::class);
         $this->addPriceHistoryToCollection = $this->objectManager->create(\MageSuite\LowestPriceLogger\Model\AddPriceHistoryToCollection::class);
+        $this->storeManager = $this->objectManager->get(\Magento\Store\Model\StoreManagerInterface::class);
+        $this->priceHistoryLog = $this->objectManager->get(\MageSuite\LowestPriceLogger\Model\ResourceModel\PriceHistoryLog::class);
+
+        $this->priceHistoryLog->cleanTable();
     }
 
     /**
@@ -35,12 +41,12 @@ class AddPriceHistoryToCollectionTest extends \PHPUnit\Framework\TestCase
     public function testItAddsPriceHistoryToCollection()
     {
         $this->getCurrentDateFake->setValue('2022-08-02');
-
         $this->generateLowestPriceForAllProducts->execute();
 
         $productCollection = $this->productCollectionFactory->create();
         $productCollection->getItems();
 
+        $this->storeManager->setCurrentStore($this->storeManager->getDefaultStoreView());
         $this->addPriceHistoryToCollection->execute($productCollection);
 
         $products = $productCollection->getItems();
@@ -57,5 +63,10 @@ class AddPriceHistoryToCollectionTest extends \PHPUnit\Framework\TestCase
         $this->assertCount(1, $secondSimplePriceHistory);
         $this->assertEquals(10, $secondSimplePriceHistory[0]['price']);
         $this->assertEquals('2022-08-02', $secondSimplePriceHistory[0]['log_date']);
+    }
+
+    public function tearDown(): void
+    {
+        $this->priceHistoryLog->cleanTable();
     }
 }

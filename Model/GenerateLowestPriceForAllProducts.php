@@ -11,9 +11,9 @@ class GenerateLowestPriceForAllProducts
     protected \MageSuite\LowestPriceLogger\Model\FilterOutDuplicates $filterOutDuplicates;
     protected GetCurrentDate $getCurrentDate;
     protected \Magento\Customer\Model\GroupManagement $groupManagement;
-    protected \Magento\CatalogRule\Model\ResourceModel\Product\CollectionProcessor $catalogRuleCollectionProcessor;
     protected \MageSuite\LowestPriceLogger\Helper\Configuration $configuration;
     protected $customerGroups = null;
+    protected AddCatalogRulePricesToCollection $addCatalogRulePricesToCollection;
 
     public function __construct(
         \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory,
@@ -23,8 +23,8 @@ class GenerateLowestPriceForAllProducts
         \MageSuite\LowestPriceLogger\Model\FilterOutDuplicates $filterOutDuplicates,
         GetCurrentDate $getCurrentDate,
         \Magento\Customer\Model\GroupManagement $groupManagement,
-        \Magento\CatalogRule\Model\ResourceModel\Product\CollectionProcessor $catalogRuleCollectionProcessor,
-        \MageSuite\LowestPriceLogger\Helper\Configuration $configuration
+        \MageSuite\LowestPriceLogger\Helper\Configuration $configuration,
+        AddCatalogRulePricesToCollection $addCatalogRulePricesToCollection
     ) {
         $this->productCollectionFactory = $productCollectionFactory;
         $this->customerSession = $customerSession;
@@ -33,8 +33,8 @@ class GenerateLowestPriceForAllProducts
         $this->filterOutDuplicates = $filterOutDuplicates;
         $this->getCurrentDate = $getCurrentDate;
         $this->groupManagement = $groupManagement;
-        $this->catalogRuleCollectionProcessor = $catalogRuleCollectionProcessor;
         $this->configuration = $configuration;
+        $this->addCatalogRulePricesToCollection = $addCatalogRulePricesToCollection;
     }
 
     public function execute()
@@ -89,11 +89,11 @@ class GenerateLowestPriceForAllProducts
         $lastPageNumber = $collection->getLastPageNumber();
 
         do {
+            $this->storeManager->setCurrentStore($this->storeManager->getStore($storeId));
             $collection = $this->productCollectionFactory->create();
             $collection->setPage($page, $this->configuration->getBatchSize());
             $collection->addAttributeToSelect('*');
             $collection->setStoreId($storeId);
-            $this->catalogRuleCollectionProcessor->addPriceData($collection);
             $collection->addTierPriceData();
 
             $page++;
@@ -108,25 +108,19 @@ class GenerateLowestPriceForAllProducts
     {
         $prices = [];
 
-        foreach ($products as $product) {
-            // catalog_rule_price should be joined automatically
-            // if there is no catalog rule price available for the product
-            // then we need to put false into the field so pricing engine do not try to
-            // fetch it again with a separate SQL query for every product
-            if (!$product->hasData('catalog_rule_price')) {
-                $product->setData('catalog_rule_price', false);
-            }
+        foreach ($this->getCustomerGroups() as $customerGroup) {
+            $customerGroupId = $customerGroup->getId();
+            $this->customerSession->setCustomerGroupId($customerGroupId);
 
-            $productId = $product->getId();
+            $this->addCatalogRulePricesToCollection->execute($products, $websiteId, $customerGroupId);
 
-            if (!$productId) {
-                continue;
-            }
+            foreach ($products as $product) {
+                $productId = $product->getId();
 
-            foreach ($this->getCustomerGroups() as $customerGroup) {
-                $customerGroupId = $customerGroup->getId();
+                if (!$productId) {
+                    continue;
+                }
 
-                $this->customerSession->setCustomerGroupId($customerGroupId);
                 $product->setCustomerGroupId($customerGroupId);
 
                 $priceInfo = $product->getPriceInfo();

@@ -19,7 +19,7 @@ $productFactory = $objectManager->create(\Magento\Catalog\Model\ProductFactory::
 $productRepository = $objectManager->create(\Magento\Catalog\Api\ProductRepositoryInterface::class);
 /** @var \Magento\Store\Api\WebsiteRepositoryInterface $websiteRepository */
 $websiteRepository = $objectManager->create(\Magento\Store\Api\WebsiteRepositoryInterface::class);
-$websiteId = $websiteRepository->get('test')->getId();
+$secondWebsiteId = $websiteRepository->get('test')->getId();
 $defaultWebsiteId = $websiteRepository->get('base')->getId();
 $storeManager = $objectManager->get(\Magento\Store\Model\StoreManagerInterface::class);
 $secondStoreId = $storeManager->getStore('fixture_second_store')->getId();
@@ -28,7 +28,7 @@ $secondStoreId = $storeManager->getStore('fixture_second_store')->getId();
 $product = $productFactory->create();
 $product->setTypeId(\Magento\Catalog\Model\Product\Type::TYPE_SIMPLE)
     ->setAttributeSetId($product->getDefaultAttributeSetId())
-    ->setWebsiteIds([$defaultWebsiteId, $websiteId])
+    ->setWebsiteIds([$defaultWebsiteId, $secondWebsiteId])
     ->setName('Simple Product on two websites')
     ->setSku('simple')
     ->setPrice(10)
@@ -39,9 +39,7 @@ $product->setTypeId(\Magento\Catalog\Model\Product\Type::TYPE_SIMPLE)
 
 $productRepository->save($product);
 
-$productRepository->save($product);
-
-/** @var $banner \Magento\CatalogRule\Model\Rule */
+/** @var $catalogRule \Magento\CatalogRule\Model\Rule */
 $catalogRule = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
     \Magento\CatalogRule\Model\Rule::class
 );
@@ -51,7 +49,10 @@ $catalogRule
     ->setName('Test Catalog Rule')
     ->setCustomerGroupIds((string)\Magento\Customer\Model\GroupManagement::NOT_LOGGED_IN_ID)
     ->setDiscountAmount(15)
-    ->setWebsiteIds([0 => 1])
+    ->setWebsiteIds([
+        0 => $defaultWebsiteId,
+        1 => $secondWebsiteId
+    ])
     ->setSimpleAction('by_percent')
     ->setStopRulesProcessing(false)
     ->setSortOrder(0)
