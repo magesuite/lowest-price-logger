@@ -5,4 +5,10 @@
                 type="MageSuite\LowestPriceLogger\Plugin\Framework\Pricing\Price\PriceInterface\LogPrice"
                 sortOrder="10" />
     </type>
+
+    <type name="Magento\Catalog\Model\ResourceModel\Product\Collection">
+        <plugin name="add_price_history_to_loaded_items"
+                type="MageSuite\LowestPriceLogger\Plugin\Catalog\Model\ResourceModel\Product\Collection\AddPriceHistoryToLoadedItems"
+                sortOrder="10" />
+    </type>
 </config>
