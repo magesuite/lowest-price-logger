@@ -24,7 +24,7 @@ class AddPriceHistoryToCollection
             return $collection;
         }
 
-        $collection->setFlag('price_history_loaded');
+        $collection->setFlag('price_history_loaded', true);
 
         if ($collection->getSize() === 0) {
             return $collection;
