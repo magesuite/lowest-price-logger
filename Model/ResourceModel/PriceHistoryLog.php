@@ -4,6 +4,19 @@ namespace MageSuite\LowestPriceLogger\Model\ResourceModel;
 
 class PriceHistoryLog extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
 {
+    protected \MageSuite\LowestPriceLogger\Model\GetCurrentDate $getCurrentDate;
+
+    public function __construct(
+        \Magento\Framework\Model\ResourceModel\Db\Context $context,
+        \MageSuite\LowestPriceLogger\Model\GetCurrentDate $getCurrentDate,
+        $connectionName = null
+    )
+    {
+        parent::__construct($context, $connectionName);
+
+        $this->getCurrentDate = $getCurrentDate;
+    }
+
     protected function _construct()
     {
         $this->_init('price_history_log', 'log_id');
@@ -24,7 +37,7 @@ class PriceHistoryLog extends \Magento\Framework\Model\ResourceModel\Db\Abstract
             $select->where('customer_group_id = ?', $customerGroupId);
         }
 
-        $select->where(new \Zend_Db_Expr('`log_date` > NOW()-INTERVAL 30 day'));
+        $select->where(new \Zend_Db_Expr(sprintf('`log_date` > "%s"-INTERVAL 30 day', $this->getCurrentDate->execute())));
         $select->order('price DESC');
 
         return $this->getConnection()->fetchAll($select);
