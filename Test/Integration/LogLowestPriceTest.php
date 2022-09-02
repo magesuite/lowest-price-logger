@@ -16,6 +16,7 @@ class LogLowestPriceTest extends \PHPUnit\Framework\TestCase
         $this->objectManager = \Magento\TestFramework\ObjectManager::getInstance();
         $this->getCurrentDateFake = new GetCurrentDateFake();
 
+        $this->objectManager->addSharedInstance($this->getCurrentDateFake, \MageSuite\LowestPriceLogger\Model\GetCurrentDate::class);
         $this->generateLowestPriceForAllProducts = $this->objectManager->create(
             \MageSuite\LowestPriceLogger\Model\GenerateLowestPriceForAllProducts::class,
             ['getCurrentDate' => $this->getCurrentDateFake]
