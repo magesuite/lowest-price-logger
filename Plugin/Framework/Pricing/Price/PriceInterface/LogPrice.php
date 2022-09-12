@@ -2,16 +2,8 @@
 
 namespace MageSuite\LowestPriceLogger\Plugin\Framework\Pricing\Price\PriceInterface;
 
-class LogPrice
+class LogPrice implements \MageSuite\LowestPriceLogger\Api\LogPriceInterface
 {
-    public const PRICE_TYPE_REGULAR = 2;
-    public const PRICE_TYPE_FINAL = 1;
-
-    protected $priceTypes = [
-        \Magento\Catalog\Pricing\Price\FinalPrice::PRICE_CODE => 1,
-        \Magento\Catalog\Pricing\Price\RegularPrice::PRICE_CODE => 2
-    ];
-
     protected \Magento\Customer\Model\Session $customerSession;
     protected \Magento\Store\Model\StoreManagerInterface $storeManager;
     protected \Magento\Framework\DB\Adapter\AdapterInterface $connection;
@@ -55,7 +47,9 @@ class LogPrice
             }
 
             $productId = $product->getId();
-            $price = $result;
+
+            $price = $this->getPrice($product, (float)$result);
+
             $websiteId = $this->storeManager->getWebsite()->getId();
             $customerGroupId = $this->customerSession->getCustomerGroupId();
             $date = $this->getCurrentDate->execute();
@@ -65,12 +59,33 @@ class LogPrice
                 'price' => $price,
                 'website_id' => $websiteId,
                 'customer_group_id' => $customerGroupId,
-                'price_type' => $this->priceTypes[$priceCode],
+                'price_type' => self::PRICE_TYPES[$priceCode],
                 'log_date' => $date
             ]);
         } catch (\Exception $exception) { // phpcs:ignore
         }
 
         return $result;
+    }
+
+    /**
+     * @param \Magento\Catalog\Api\Data\ProductInterface $product
+     * @param float $price
+     * @return float
+     */
+    protected function getPrice($product, float $price): float
+    {
+        if ($product->getTypeId() == \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE
+            && $product->getPriceType() == \Magento\Bundle\Model\Product\Price::PRICE_TYPE_DYNAMIC) {
+            /**
+             * getAmount() method returns \Magento\Framework\Pricing\Adjustment\AdjustmentInterface
+             */
+            return (float) $product->getPriceInfo()
+                ->getPrice(\Magento\Catalog\Pricing\Price\FinalPrice::PRICE_CODE)
+                ->getAmount()
+                ->getValue();
+        }
+
+        return $price;
     }
 }

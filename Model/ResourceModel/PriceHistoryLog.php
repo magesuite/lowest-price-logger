@@ -10,8 +10,7 @@ class PriceHistoryLog extends \Magento\Framework\Model\ResourceModel\Db\Abstract
         \Magento\Framework\Model\ResourceModel\Db\Context $context,
         \MageSuite\LowestPriceLogger\Model\GetCurrentDate $getCurrentDate,
         $connectionName = null
-    )
-    {
+    ) {
         parent::__construct($context, $connectionName);
 
         $this->getCurrentDate = $getCurrentDate;
