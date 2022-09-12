@@ -24,7 +24,7 @@ class PriceType extends \Magento\Ui\Component\Listing\Columns\Column
     protected function getPriceTypeLabel($item): \Magento\Framework\Phrase
     {
         return
-            $item == \MageSuite\LowestPriceLogger\Plugin\Framework\Pricing\Price\PriceInterface\LogPrice::PRICE_TYPE_FINAL
+            $item == \MageSuite\LowestPriceLogger\Api\LogPriceInterface::PRICE_TYPE_FINAL
             ? __('Final price') : __('Regular price');
     }
 }

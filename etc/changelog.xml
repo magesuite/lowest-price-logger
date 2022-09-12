@@ -1,0 +1,18 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:MageSuite_Changelog:etc/changelog.xsd">
+    <module
+        id="MageSuite_LowestPriceLogger"
+        name="MageSuite_LowestPriceLogger"
+        description="This module logs prices history"
+        url="https://github.com/magesuite/lowest-price-logger">
+        <changelog>
+            <tag version="v1.0.3" date="2022-09-05">
+                <entry>
+                    <type>FIX</type>
+                    <overview>Fix for logging dynamic bundle products prices.</overview>
+                    <ticket_id>MGS-4706</ticket_id>
+                </entry>
+            </tag>
+        </changelog>
+    </module>
+</config>
