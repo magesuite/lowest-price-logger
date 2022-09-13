@@ -21,6 +21,7 @@ class LogBundleProductPriceFromFrontendTest extends \Magento\TestFramework\TestC
 
     /**
      * @magentoDataFixture Magento/Bundle/_files/PriceCalculator/fixed_bundle_product.php
+     * @magentoAppArea frontend
      */
     public function testBundleWithFixedPrice(): void
     {
