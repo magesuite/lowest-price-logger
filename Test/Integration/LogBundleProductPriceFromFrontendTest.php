@@ -17,11 +17,21 @@ class LogBundleProductPriceFromFrontendTest extends \Magento\TestFramework\TestC
         $this->objectManager = \Magento\TestFramework\ObjectManager::getInstance();
         $this->priceHistoryLog = $this->objectManager->get(\MageSuite\LowestPriceLogger\Model\ResourceModel\PriceHistoryLog::class);
         $this->productRepository = $this->objectManager->get(\Magento\Catalog\Api\ProductRepositoryInterface::class);
+        $this->priceHistoryLog->cleanTable();
+    }
+
+    /**
+     * @return void
+     */
+    public function tearDown(): void
+    {
+        $this->priceHistoryLog->cleanTable();
     }
 
     /**
      * @magentoDataFixture Magento/Bundle/_files/PriceCalculator/fixed_bundle_product.php
      * @magentoAppArea frontend
+     * @magentoDbIsolation disabled
      */
     public function testBundleWithFixedPrice(): void
     {
@@ -35,6 +45,8 @@ class LogBundleProductPriceFromFrontendTest extends \Magento\TestFramework\TestC
 
     /**
      * @magentoDataFixture Magento/Bundle/_files/bundle_product_dropdown_options.php
+     * @magentoAppArea frontend
+     * @magentoDbIsolation disabled
      */
     public function testBundleWithDynamicPrice(): void
     {
