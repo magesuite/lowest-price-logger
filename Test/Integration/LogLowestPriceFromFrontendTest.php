@@ -20,7 +20,6 @@ class LogLowestPriceFromFrontendTest extends \Magento\TestFramework\TestCase\Abs
         $this->priceHistoryLog = $this->objectManager->get(\MageSuite\LowestPriceLogger\Model\ResourceModel\PriceHistoryLog::class);
         $this->productRepository = $this->objectManager->get(\Magento\Catalog\Api\ProductRepositoryInterface::class);
         $this->websiteFactory = $this->objectManager->create(\Magento\Store\Model\WebsiteFactory::class);
-
         $this->priceHistoryLog->cleanTable();
     }
 
