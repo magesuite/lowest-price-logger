@@ -42,6 +42,22 @@ class PriceHistoryLog extends \Magento\Framework\Model\ResourceModel\Db\Abstract
         return $this->getConnection()->fetchAll($select);
     }
 
+    public function getLowestPrices(array $productIds, int $websiteId, int $customerGroupId)
+    {
+        $select = $this->getConnection()->select();
+        $select->from($this->getTableName());
+
+        $select->where('product_id IN(?)', $productIds);
+        $select->where('website_id = ?', $websiteId);
+        $select->where('customer_group_id = ?', $customerGroupId);
+        $select->where(new \Zend_Db_Expr('`log_date` > NOW()-INTERVAL 30 day'));
+
+        $select->order('price ASC');
+        $select->group('product_id');
+
+        return $this->getConnection()->fetchAll($select);
+    }
+
     public function getLowestPrice(array $productIds, int $websiteId, int $customerGroupId)
     {
         $select = $this->getConnection()->select();
