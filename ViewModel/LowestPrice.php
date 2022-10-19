@@ -66,4 +66,11 @@ class LowestPrice implements \Magento\Framework\View\Element\Block\ArgumentInter
 
         return $min;
     }
+
+    public function hasSpecialPrice($product)
+    {
+        $displayRegularPrice = $product->getPriceInfo()->getPrice(\Magento\Catalog\Pricing\Price\RegularPrice::PRICE_CODE)->getAmount()->getValue();
+        $displayFinalPrice = $product->getPriceInfo()->getPrice(\Magento\Catalog\Pricing\Price\FinalPrice::PRICE_CODE)->getAmount()->getValue();
+        return $displayFinalPrice < $displayRegularPrice;
+    }
 }

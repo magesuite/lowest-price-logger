@@ -53,6 +53,10 @@ class LogBundleProductPriceFromFrontendTest extends \Magento\TestFramework\TestC
         $product = $this->productRepository->get('bundle-product-dropdown-options');
         $simpleProduct = $this->productRepository->get('simple-1');
 
+        $indexerRegistry = $this->objectManager->create(\Magento\Framework\Indexer\IndexerRegistry::class);
+        $indexerRegistry->get(\Magento\Catalog\Model\Indexer\Product\Price\Processor::INDEXER_ID)
+            ->reindexList([$product->getId(), $simpleProduct->getId()]);
+
         $this->dispatch(sprintf('catalog/product/view/id/%s/', $product->getId()));
 
         $priceHistory = $this->priceHistoryLog->getPriceHistory([$product->getId()], 1, 0);
