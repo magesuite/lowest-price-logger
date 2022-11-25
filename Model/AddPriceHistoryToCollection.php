@@ -26,15 +26,15 @@ class AddPriceHistoryToCollection
 
         $collection->setFlag('price_history_loaded', true);
 
-        if ($collection->getSize() === 0) {
-            return $collection;
-        }
-
         $productIds = [];
 
         foreach ($collection->getItems() as $item) {
             $productsById[$item->getData('entity_id')] = $item;
             $productIds[] = $item->getData('entity_id');
+        }
+
+        if (empty($productIds)) {
+            return $collection;
         }
 
         $priceHistory = $this->priceHistoryLog->getPriceHistory(
