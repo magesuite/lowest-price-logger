@@ -126,13 +126,21 @@ class GenerateLowestPriceForAllProducts
 
                 $priceInfo = $product->getPriceInfo();
 
-                $finalPrice = $priceInfo
-                    ->getPrice(\Magento\Catalog\Pricing\Price\FinalPrice::PRICE_CODE)
-                    ->getValue();
+                if ($product->getTypeId() == \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE
+                    && $product->getPriceType() == \Magento\Bundle\Model\Product\Price::PRICE_TYPE_DYNAMIC) {
+                    $finalPrice = $regularPrice = (float) $product->getPriceInfo()
+                        ->getPrice(\Magento\Catalog\Pricing\Price\FinalPrice::PRICE_CODE)
+                        ->getAmount()
+                        ->getValue();
+                } else {
+                    $finalPrice = $priceInfo
+                        ->getPrice(\Magento\Catalog\Pricing\Price\FinalPrice::PRICE_CODE)
+                        ->getValue();
 
-                $regularPrice = $priceInfo
-                    ->getPrice(\Magento\Catalog\Pricing\Price\RegularPrice::PRICE_CODE)
-                    ->getValue();
+                    $regularPrice = $priceInfo
+                        ->getPrice(\Magento\Catalog\Pricing\Price\RegularPrice::PRICE_CODE)
+                        ->getValue();
+                }
 
                 $prices[] = [
                     'product_id' => $productId,

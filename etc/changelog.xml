@@ -13,6 +13,13 @@
                     <ticket_id>MGS-4706</ticket_id>
                 </entry>
             </tag>
+            <tag version="v1.0.8" date="2023-01-23">
+                <entry>
+                    <type>FIX</type>
+                    <overview>Fix for logging dynamic bundle products prices with cron.</overview>
+                    <ticket_id>MGS-4706</ticket_id>
+                </entry>
+            </tag>
         </changelog>
     </module>
 </config>
