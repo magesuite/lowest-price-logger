@@ -44,7 +44,7 @@ class AddCatalogRulePricesToCollection
         $select->where('catalog_rule.rule_date = ?', $date);
         $catalogRulePrices = $this->connection->fetchAll($select);
         $pricePerProduct = [];
-        
+
         if (!empty($catalogRulePrices)) {
             foreach ($catalogRulePrices as $price) {
                 $pricePerProduct[$price['product_id']] = $price['rule_price'];
