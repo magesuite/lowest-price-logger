@@ -18,6 +18,7 @@ $storeGroup = $objectManager->create(\Magento\Store\Model\Group::class);
 if (!$storeGroup->load('Test Website Store Group', 'name')->getId()) {
     $storeGroup->setWebsiteId($website->getId());
     $storeGroup->setName('Test Website Store Group');
+    $storeGroup->setCode('test_website_store_group');
     $storeGroup->setRootCategoryId(2);
     $storeGroup->save();
 }
