@@ -8,22 +8,29 @@ class LowestPrice implements \Magento\Framework\View\Element\Block\ArgumentInter
     protected \Magento\Store\Model\StoreManagerInterface $storeManager;
     protected \Magento\Customer\Model\Session $customerSession;
     protected \Magento\Framework\Pricing\Helper\Data $pricingHelper;
+    protected \MageSuite\LowestPriceLogger\Model\AddPriceHistoryToCollection $addPriceHistoryToCollection;
 
     public function __construct(
         \MageSuite\LowestPriceLogger\Model\ResourceModel\PriceHistoryLog $priceHistoryLog,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Customer\Model\Session $customerSession,
-        \Magento\Framework\Pricing\Helper\Data $pricingHelper
+        \Magento\Framework\Pricing\Helper\Data $pricingHelper,
+        \MageSuite\LowestPriceLogger\Model\AddPriceHistoryToCollection $addPriceHistoryToCollection
     ) {
         $this->priceHistoryLog = $priceHistoryLog;
         $this->storeManager = $storeManager;
         $this->customerSession = $customerSession;
         $this->pricingHelper = $pricingHelper;
+        $this->addPriceHistoryToCollection = $addPriceHistoryToCollection;
     }
 
     public function getByProduct(\Magento\Catalog\Model\Product $product, bool $withCurrency = false): ?string
     {
         $store = $this->storeManager->getStore();
+
+        if ($product->getData('origins_from_collection') !== null) {
+            $this->addPriceHistoryToCollection->execute($product->getData('origins_from_collection'));
+        }
 
         if ($product->hasData('price_history')) {
             $price = $this->getLowestPriceFromHistory($product->getData('price_history'));
