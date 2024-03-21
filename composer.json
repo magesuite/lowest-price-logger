@@ -3,6 +3,9 @@
     "description": "",
     "license": "OSL-3.0",
     "type": "magento2-module",
+    "require": {
+        "creativestyle/magesuite-performance-preload": "^1.0.0"
+    },
     "autoload": {
         "files": [
             "registration.php"
