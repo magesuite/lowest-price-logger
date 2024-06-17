@@ -4,24 +4,34 @@ namespace MageSuite\LowestPriceLogger\ViewModel;
 
 class LowestPrice implements \Magento\Framework\View\Element\Block\ArgumentInterface
 {
-    protected \MageSuite\LowestPriceLogger\Model\ResourceModel\PriceHistoryLog $priceHistoryLog;
-    protected \Magento\Store\Model\StoreManagerInterface $storeManager;
+    protected \Magento\Catalog\Helper\Data $catalogHelper;
     protected \Magento\Customer\Model\Session $customerSession;
     protected \Magento\Framework\Pricing\Helper\Data $pricingHelper;
+    protected \Magento\Store\Model\StoreManagerInterface $storeManager;
+    protected \Magento\Tax\Api\TaxCalculationInterface $taxCalculation;
+    protected \Magento\Tax\Helper\Data $taxHelper;
+    protected \Magento\Tax\Model\Config $taxConfig;
     protected \MageSuite\LowestPriceLogger\Model\AddPriceHistoryToCollection $addPriceHistoryToCollection;
+    protected \MageSuite\LowestPriceLogger\Model\ResourceModel\PriceHistoryLog $priceHistoryLog;
 
     public function __construct(
+        \MageSuite\LowestPriceLogger\Model\AddPriceHistoryToCollection $addPriceHistoryToCollection,
         \MageSuite\LowestPriceLogger\Model\ResourceModel\PriceHistoryLog $priceHistoryLog,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Magento\Catalog\Helper\Data $catalogHelper,
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Framework\Pricing\Helper\Data $pricingHelper,
-        \MageSuite\LowestPriceLogger\Model\AddPriceHistoryToCollection $addPriceHistoryToCollection
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Magento\Tax\Api\TaxCalculationInterface $taxCalculation,
+        \Magento\Tax\Helper\Data $taxHelper
     ) {
-        $this->priceHistoryLog = $priceHistoryLog;
-        $this->storeManager = $storeManager;
-        $this->customerSession = $customerSession;
-        $this->pricingHelper = $pricingHelper;
         $this->addPriceHistoryToCollection = $addPriceHistoryToCollection;
+        $this->catalogHelper = $catalogHelper;
+        $this->customerSession = $customerSession;
+        $this->priceHistoryLog = $priceHistoryLog;
+        $this->pricingHelper = $pricingHelper;
+        $this->storeManager = $storeManager;
+        $this->taxCalculation = $taxCalculation;
+        $this->taxHelper = $taxHelper;
     }
 
     public function getByProduct(\Magento\Catalog\Model\Product $product, bool $withCurrency = false): ?string
@@ -50,11 +60,26 @@ class LowestPrice implements \Magento\Framework\View\Element\Block\ArgumentInter
             return null;
         }
 
+        $price = $this->calculatePriceWithTax($product, (float) $price);
+
         if ($withCurrency) {
             $price = $this->pricingHelper->currencyByStore($price, $store, true, false);
         }
 
         return $price;
+    }
+
+    public function calculatePriceWithTax(\Magento\Catalog\Api\Data\ProductInterface $product, float $value): float
+    {
+        $customerId = $this->customerSession->getCustomerId();
+
+        $taxRate = $this->taxCalculation->getCalculatedRate($product->getTaxClassId(), $customerId);
+
+        if (empty($taxRate) || !$this->taxHelper->displayPriceIncludingTax()) {
+            return $value;
+        }
+
+        return $this->catalogHelper->getTaxPrice($product, $value, true);
     }
 
     protected function getLowestPriceFromHistory($priceHistory): ?float

@@ -6,18 +6,25 @@
         description="This module logs prices history"
         url="https://github.com/magesuite/lowest-price-logger">
         <changelog>
-            <tag version="v1.0.3" date="2022-09-05">
+            <tag version="1.0.3" date="2022-09-05">
                 <entry>
                     <type>FIX</type>
                     <overview>Fix for logging dynamic bundle products prices.</overview>
                     <ticket_id>MGS-4706</ticket_id>
                 </entry>
             </tag>
-            <tag version="v1.0.8" date="2023-01-23">
+            <tag version="1.0.8" date="2023-01-23">
                 <entry>
                     <type>FIX</type>
                     <overview>Fix for logging dynamic bundle products prices with cron.</overview>
                     <ticket_id>MGS-4706</ticket_id>
+                </entry>
+            </tag>
+            <tag version="1.1.2" date="2024-06-04">
+                <entry>
+                    <type>FIX</type>
+                    <overview>Fix tax rate calculation for lowest price in last 30 days</overview>
+                    <ticket_id>FR-163</ticket_id>
                 </entry>
             </tag>
         </changelog>
