@@ -21,7 +21,7 @@ class PriceHistoryLog extends \Magento\Framework\Model\ResourceModel\Db\Abstract
         $this->_init('price_history_log', 'log_id');
     }
 
-    public function getPriceHistory(array $productIds, int $websiteId = null, int $customerGroupId = null)
+    public function getPriceHistory(array $productIds, ?int $websiteId = null, ?int $customerGroupId = null)
     {
         $select = $this->getConnection()->select();
         $select->from($this->getTableName());
@@ -74,7 +74,7 @@ class PriceHistoryLog extends \Magento\Framework\Model\ResourceModel\Db\Abstract
         return $this->getConnection()->fetchRow($select);
     }
 
-    public function getLastPricesPerProduct(array $productIds, int $websiteId = null, int $customerGroupId = null)
+    public function getLastPricesPerProduct(array $productIds, ?int $websiteId = null, ?int $customerGroupId = null)
     {
         $select = $this->getConnection()->select();
         $select->from($this->getTableName());
