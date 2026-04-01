@@ -1,7 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MageSuite\LowestPriceLogger\Model;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class GenerateLowestPriceForAllProducts
 {
     protected \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory;
@@ -12,7 +17,7 @@ class GenerateLowestPriceForAllProducts
     protected GetCurrentDate $getCurrentDate;
     protected \Magento\Customer\Model\GroupManagement $groupManagement;
     protected \MageSuite\LowestPriceLogger\Helper\Configuration $configuration;
-    protected $customerGroups = null;
+    protected ?array $customerGroups = null;
     protected AddCatalogRulePricesToCollection $addCatalogRulePricesToCollection;
 
     public function __construct(
@@ -37,7 +42,7 @@ class GenerateLowestPriceForAllProducts
         $this->addCatalogRulePricesToCollection = $addCatalogRulePricesToCollection;
     }
 
-    public function execute()
+    public function execute(): void
     {
         $websites = $this->storeManager->getWebsites();
 
@@ -46,7 +51,7 @@ class GenerateLowestPriceForAllProducts
         }
     }
 
-    protected function generatePricesForWebsite($website)
+    protected function generatePricesForWebsite(\Magento\Store\Api\Data\WebsiteInterface $website): void
     {
         $stores = $website->getStores();
 
@@ -60,8 +65,8 @@ class GenerateLowestPriceForAllProducts
             return;
         }
 
-        $storeId = $store->getStoreId();
-        $websiteId = $website->getId();
+        $storeId = (int)$store->getStoreId();
+        $websiteId = (int)$website->getId();
 
         foreach ($this->getProductsBatch($storeId) as $products) {
             $prices = $this->calculateProductPrices($products, $websiteId);
@@ -79,30 +84,31 @@ class GenerateLowestPriceForAllProducts
         }
     }
 
-    public function getProductsBatch($storeId)
+    public function getProductsBatch(int $storeId): \Traversable
     {
-        $page = 1;
+        $lastEntityId = 0;
+        $batchSize = $this->configuration->getBatchSize();
+        $this->storeManager->setCurrentStore($this->storeManager->getStore($storeId));
 
-        $collection = $this->productCollectionFactory->create();
-        $collection->setStoreId($storeId);
-        $collection->setPageSize($this->configuration->getBatchSize());
-        $lastPageNumber = $collection->getLastPageNumber();
-
-        do {
-            $this->storeManager->setCurrentStore($this->storeManager->getStore($storeId));
+        while (true) {
             $collection = $this->productCollectionFactory->create();
-            $collection->setPage($page, $this->configuration->getBatchSize());
-            $collection->addAttributeToSelect('*');
             $collection->setStoreId($storeId);
+            $collection->addAttributeToSelect(['price', 'special_price', 'special_from_date', 'special_to_date', 'price_type'], 'left');
+            $collection->addFieldToFilter('entity_id', ['gt' => $lastEntityId]);
+            $collection->setOrder('entity_id', \Magento\Framework\Data\Collection::SORT_ORDER_ASC);
+            $collection->setPageSize($batchSize);
             $collection->addTierPriceData();
             $collection = $this->processCollection($collection, $storeId);
 
-            $page++;
+            if (!$collection->count()) {
+                break;
+            }
 
             $products = $collection->getItems();
+            $lastEntityId = (int)$collection->getLastItem()->getId();
 
             yield $products;
-        } while ($page <= $lastPageNumber);
+        }
     }
 
     protected function calculateProductPrices(array $products, int $websiteId): array
@@ -110,7 +116,7 @@ class GenerateLowestPriceForAllProducts
         $prices = [];
 
         foreach ($this->getCustomerGroups() as $customerGroup) {
-            $customerGroupId = $customerGroup->getId();
+            $customerGroupId = (int)$customerGroup->getId();
             $this->customerSession->setCustomerGroupId($customerGroupId);
 
             $this->addCatalogRulePricesToCollection->execute($products, $websiteId, $customerGroupId);
@@ -173,7 +179,7 @@ class GenerateLowestPriceForAllProducts
         return $prices;
     }
 
-    protected function getCustomerGroups()
+    protected function getCustomerGroups(): array
     {
         if ($this->customerGroups == null) {
             $this->customerGroups = array_merge([$this->groupManagement->getNotLoggedInGroup()], $this->groupManagement->getLoggedInGroups());
@@ -185,7 +191,7 @@ class GenerateLowestPriceForAllProducts
     /**
      * Extension point for adding custom prices to log
      */
-    public function addCustomPrices(array $prices, $product, int $websiteId, int $customerGroupId) // phpcs:ignore
+    public function addCustomPrices(array $prices, $product, int $websiteId, int $customerGroupId): array // phpcs:ignore
     {
         return $prices;
     }
@@ -193,7 +199,7 @@ class GenerateLowestPriceForAllProducts
     /**
      * Extension point for modifying collection configuration to allow customizations
      */
-    public function processCollection(\Magento\Catalog\Model\ResourceModel\Product\Collection $collection, int $storeId)
+    public function processCollection(\Magento\Catalog\Model\ResourceModel\Product\Collection $collection, int $storeId): \Magento\Catalog\Model\ResourceModel\Product\Collection
     {
         return $collection;
     }
