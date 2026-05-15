@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MageSuite\LowestPriceLogger\Model;
 
 class PriceStorage
 {
-    protected $prices = [];
+    protected array $prices = [];
 
-    public function addPriceData($priceData)
+    public function addPriceData(array $priceData): void
     {
         $key = $this->getKey($priceData);
 
@@ -15,12 +17,12 @@ class PriceStorage
         }
     }
 
-    public function getPrices()
+    public function getPrices(): array
     {
         return $this->prices;
     }
 
-    protected function getKey($priceData)
+    protected function getKey(array $priceData): string
     {
         return md5(implode('|', $priceData)); // phpcs:ignore
     }

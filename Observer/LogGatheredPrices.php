@@ -1,40 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MageSuite\LowestPriceLogger\Observer;
 
 class LogGatheredPrices implements \Magento\Framework\Event\ObserverInterface
 {
-    protected \MageSuite\LowestPriceLogger\Model\PriceStorage $priceStorage;
-    protected \Magento\Framework\DB\Adapter\AdapterInterface $connection;
-    protected \MageSuite\LowestPriceLogger\Model\FilterOutDuplicates $filterOutDuplicates;
-
     public function __construct(
-        \MageSuite\LowestPriceLogger\Model\PriceStorage $priceStorage,
-        \Magento\Framework\App\ResourceConnection $resourceConnection,
-        \MageSuite\LowestPriceLogger\Model\FilterOutDuplicates $filterOutDuplicates
+        protected \MageSuite\LowestPriceLogger\Model\PriceStorage $priceStorage,
+        protected \MageSuite\LowestPriceLogger\Service\LogGatheredPrices $logGatheredPrices
     ) {
-        $this->priceStorage = $priceStorage;
-        $this->connection = $resourceConnection->getConnection();
-        $this->filterOutDuplicates = $filterOutDuplicates;
     }
 
-    public function execute(\Magento\Framework\Event\Observer $observer)
+    public function execute(\Magento\Framework\Event\Observer $observer): void
     {
-        if (empty($this->priceStorage->getPrices())) {
-            return;
-        }
-
         $prices = $this->priceStorage->getPrices();
-        $prices = $this->filterOutDuplicates->execute($prices);
-
         if (empty($prices)) {
             return;
         }
 
-        $this->connection->insertOnDuplicate(
-            $this->connection->getTableName('price_history_log'),
-            $prices,
-            []
-        );
+        $this->logGatheredPrices->execute($prices);
     }
 }

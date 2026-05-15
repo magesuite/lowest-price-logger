@@ -8,5 +8,8 @@
         <job name="cleanup_price_history_log" instance="MageSuite\LowestPriceLogger\Cron\LogsCleanup" method="execute">
             <config_path>lowest_price_logger/cleanup_cron/schedule_expression</config_path>
         </job>
+        <job name="process_staged_prices" instance="MageSuite\LowestPriceLogger\Cron\TransferStagedPricesToLog" method="execute">
+            <config_path>lowest_price_logger/staging_cron/schedule_expression</config_path>
+        </job>
     </group>
 </config>

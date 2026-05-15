@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MageSuite\LowestPriceLogger\Helper;
 
 class Configuration
@@ -8,31 +10,38 @@ class Configuration
     public const CALCULATION_CRON_ENABLED_XML_PATH = 'lowest_price_logger/cron/enabled';
     public const CLEANUP_CRON_ENABLED_XML_PATH = 'lowest_price_logger/cleanup_cron/enabled';
     public const CLEANUP_CRON_RETENTION_PERIOD_IN_DAYS_PATH = 'lowest_price_logger/cleanup_cron/retention_period_in_days';
+    public const ASYNC_LOGGING_ENABLED_XML_PATH = 'lowest_price_logger/general/async_logging_enabled';
 
-    protected \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig;
-
-    public function __construct(\Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig)
-    {
-        $this->scopeConfig = $scopeConfig;
+    public function __construct(
+        protected \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        protected int $batchSize = 1000
+    ) {
     }
 
-    public function getBatchSize()
+    public function getBatchSize(): int
     {
-        return $this->scopeConfig->getValue(self::BATCH_SIZE_XML_PATH);
+        $batchSize = (int)$this->scopeConfig->getValue(self::BATCH_SIZE_XML_PATH);
+
+        return $batchSize > 0 ? $batchSize : $this->batchSize;
     }
 
-    public function isCalculationCronEnabled()
+    public function isCalculationCronEnabled(): bool
     {
-        return $this->scopeConfig->getValue(self::CALCULATION_CRON_ENABLED_XML_PATH);
+        return $this->scopeConfig->isSetFlag(self::CALCULATION_CRON_ENABLED_XML_PATH);
     }
 
-    public function isCleanupCronEnabled()
+    public function isCleanupCronEnabled(): bool
     {
-        return $this->scopeConfig->getValue(self::CLEANUP_CRON_ENABLED_XML_PATH);
+        return $this->scopeConfig->isSetFlag(self::CLEANUP_CRON_ENABLED_XML_PATH);
     }
 
-    public function getLogsRetentionPeriodInDays()
+    public function getLogsRetentionPeriodInDays(): int
     {
-        return $this->scopeConfig->getValue(self::CLEANUP_CRON_RETENTION_PERIOD_IN_DAYS_PATH);
+        return (int)$this->scopeConfig->getValue(self::CLEANUP_CRON_RETENTION_PERIOD_IN_DAYS_PATH);
+    }
+
+    public function isAsyncLoggingEnabled(): bool
+    {
+        return $this->scopeConfig->isSetFlag(self::ASYNC_LOGGING_ENABLED_XML_PATH);
     }
 }
