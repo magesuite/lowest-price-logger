@@ -29,7 +29,7 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
     public function setWebsiteId(int $websiteId): self
     {
         $this->_mainTable = $this->tableMaintainer->getTableNameForWebsite($websiteId);
-        $this->getSelect()->reset();
+        $this->getSelect()->reset(\Magento\Framework\DB\Select::FROM);
         $this->_initSelect();
 
         return $this;
