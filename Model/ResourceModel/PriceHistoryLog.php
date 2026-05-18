@@ -6,6 +6,7 @@ namespace MageSuite\LowestPriceLogger\Model\ResourceModel;
 
 class PriceHistoryLog extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
 {
+    //@codingStandardsIgnoreStart
     public function __construct(
         \Magento\Framework\Model\ResourceModel\Db\Context $context,
         protected \MageSuite\LowestPriceLogger\Model\TableMaintainer $tableMaintainer,
@@ -15,6 +16,7 @@ class PriceHistoryLog extends \Magento\Framework\Model\ResourceModel\Db\Abstract
     ) {
         parent::__construct($context, $connectionName);
     }
+    //@codingStandardsIgnoreEnd
 
     protected function _construct(): void
     {
