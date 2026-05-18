@@ -25,7 +25,6 @@ class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
     public function getData(): array
     {
         $this->collection->setWebsiteId($this->resolveWebsiteId());
-        $this->collection->_resetState();
 
         if ($this->request->getParam('current_product_id')) {
             $this->collection->addFieldToFilter('product_id', (int) $this->request->getParam('current_product_id'));

@@ -24,9 +24,10 @@ class Price extends \Magento\Ui\Component\Listing\Columns\Column
             return $dataSource;
         }
 
-        $store = $this->storeManager->getStore(
-            (int)$this->request->getParam('current_store_id', \Magento\Store\Model\Store::DEFAULT_STORE_ID)
-        );
+        $storeId = (int)$this->request->getParam('current_store_id');
+        $store = $storeId
+            ? $this->storeManager->getStore($storeId)
+            : $this->storeManager->getDefaultStoreView();
 
         $fieldName = $this->getData('name');
         foreach ($dataSource['data']['items'] as & $item) {

@@ -16,14 +16,14 @@ class LogGatheredPrices
 
     public function execute(array $prices): void
     {
-        $prices = $this->filterOutDuplicates->execute($prices);
-        if (empty($prices)) {
-            return;
-        }
-
         $connection = $this->resourceConnection->getConnection();
 
         foreach ($this->groupByWebsite($prices) as $websiteId => $websitePrices) {
+            $websitePrices = $this->filterOutDuplicates->execute($websitePrices, $websiteId);
+            if (empty($websitePrices)) {
+                continue;
+            }
+
             $connection->insertOnDuplicate(
                 $this->tableMaintainer->getTableNameForWebsite($websiteId),
                 $this->tableMaintainer->stripWebsiteId($websitePrices),
