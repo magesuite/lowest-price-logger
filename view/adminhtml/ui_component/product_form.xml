@@ -10,6 +10,13 @@
                 <item name="additionalClasses" xsi:type="string">cs-csfeature__logo</item>
             </item>
         </argument>
+        <htmlContent name="price_history_log_website_name">
+            <block class="Magento\Framework\View\Element\Template" name="price_history_log_website_name" template="MageSuite_LowestPriceLogger::product/website_name.phtml">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">MageSuite\LowestPriceLogger\ViewModel\Adminhtml\Product\WebsiteName</argument>
+                </arguments>
+            </block>
+        </htmlContent>
         <insertListing name="price_history_log_listing_insert">
             <settings>
                 <dataLinks>

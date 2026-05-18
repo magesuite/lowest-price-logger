@@ -10,7 +10,6 @@ class Configuration
     public const CALCULATION_CRON_ENABLED_XML_PATH = 'lowest_price_logger/cron/enabled';
     public const CLEANUP_CRON_ENABLED_XML_PATH = 'lowest_price_logger/cleanup_cron/enabled';
     public const CLEANUP_CRON_RETENTION_PERIOD_IN_DAYS_PATH = 'lowest_price_logger/cleanup_cron/retention_period_in_days';
-    public const ASYNC_LOGGING_ENABLED_XML_PATH = 'lowest_price_logger/general/async_logging_enabled';
 
     public function __construct(
         protected \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
@@ -38,10 +37,5 @@ class Configuration
     public function getLogsRetentionPeriodInDays(): int
     {
         return (int)$this->scopeConfig->getValue(self::CLEANUP_CRON_RETENTION_PERIOD_IN_DAYS_PATH);
-    }
-
-    public function isAsyncLoggingEnabled(): bool
-    {
-        return $this->scopeConfig->isSetFlag(self::ASYNC_LOGGING_ENABLED_XML_PATH);
     }
 }

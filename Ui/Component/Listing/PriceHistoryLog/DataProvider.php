@@ -1,46 +1,46 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MageSuite\LowestPriceLogger\Ui\Component\Listing\PriceHistoryLog;
 
 class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
 {
-    /**
-     * @var \Magento\Framework\App\RequestInterface
-     */
-    protected $request;
-    protected \Magento\Store\Model\StoreManagerInterface $storeManager;
-
+    //@codingStandardsIgnoreStart
     public function __construct(
         $name,
         $primaryFieldName,
         $requestFieldName,
-        \MageSuite\LowestPriceLogger\Model\ResourceModel\PriceHistoryLog\CollectionFactory $priceHistoryLogCollection,
-        \Magento\Framework\App\RequestInterface $request,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \MageSuite\LowestPriceLogger\Model\ResourceModel\PriceHistoryLog\CollectionFactory $collectionFactory,
+        protected \Magento\Framework\App\RequestInterface $request,
+        protected \Magento\Store\Model\StoreManagerInterface $storeManager,
         array $meta = [],
         array $data = []
     ) {
-        $this->collection = $priceHistoryLogCollection->create();
-        $this->request = $request;
-
+        $this->collection = $collectionFactory->create();
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
-        $this->storeManager = $storeManager;
     }
+    //@codingStandardsIgnoreEnd
 
-    public function getData()
+    public function getData(): array
     {
+        $this->collection->setWebsiteId($this->resolveWebsiteId());
+        $this->collection->_resetState();
+
         if ($this->request->getParam('current_product_id')) {
-            $this->collection->addFieldToFilter('product_id', $this->request->getParam('current_product_id'));
-        }
-
-        if ($this->request->getParam('current_store_id')) {
-            $storeId = $this->request->getParam('current_store_id');
-            $store = $this->storeManager->getStore($storeId);
-            $websiteId = $store->getWebsiteId();
-
-            $this->collection->addFieldToFilter('website_id', $websiteId);
+            $this->collection->addFieldToFilter('product_id', (int) $this->request->getParam('current_product_id'));
         }
 
         return parent::getData();
+    }
+
+    protected function resolveWebsiteId(): int
+    {
+        $storeId = $this->request->getParam('current_store_id');
+        if ($storeId) {
+            return (int)$this->storeManager->getStore((int)$storeId)->getWebsiteId();
+        }
+
+        return (int)$this->storeManager->getDefaultStoreView()->getWebsiteId();
     }
 }

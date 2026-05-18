@@ -11,7 +11,7 @@ class FilterOutDuplicates
         $this->priceHistoryLog = $priceHistoryLog;
     }
 
-    public function execute($prices, $websiteId = null, $customerGroupId = null)
+    public function execute(array $prices, ?int $websiteId = null, ?int $customerGroupId = null): array
     {
         if (empty($prices)) {
             return [];
@@ -42,7 +42,7 @@ class FilterOutDuplicates
         return $prices;
     }
 
-    protected function isDuplicateOfLastLoggedPrice($lastPrices, $priceData): bool
+    protected function isDuplicateOfLastLoggedPrice(array $lastPrices, array $priceData): bool
     {
         if (isset($lastPrices[$priceData['product_id']][$priceData['customer_group_id']][$priceData['website_id']][$priceData['price_type']])) {
             if ($lastPrices[$priceData['product_id']][$priceData['customer_group_id']][$priceData['website_id']][$priceData['price_type']] == $priceData['price']) {

@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+<type name="Magento\Store\Model\ResourceModel\Website">
+        <plugin name="magesuite_lowest_price_logger_manage_price_history_tables"
+                type="MageSuite\LowestPriceLogger\Plugin\Store\Model\ResourceModel\Website\ManagePriceHistoryTables"
+                sortOrder="10"/>
+    </type>
+</config>

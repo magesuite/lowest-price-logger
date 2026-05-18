@@ -1,0 +1,13 @@
+<?php
+/** @var \Magento\Framework\View\Element\Template $block */
+/** @var \Magento\Framework\Escaper $escaper */
+/** @var \MageSuite\LowestPriceLogger\ViewModel\Adminhtml\Product\WebsiteName $viewModel */
+$viewModel = $block->getData('view_model');
+$websiteName = $viewModel->getWebsiteName();
+if (!$websiteName) {
+    return;
+}
+?>
+<p class="price-history-log-website-name">
+    <?= $escaper->escapeHtml(__('Prices are displayed for website: %1', $websiteName)) ?>
+</p>

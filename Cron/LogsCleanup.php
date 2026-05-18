@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MageSuite\LowestPriceLogger\Cron;
 
 class LogsCleanup
@@ -15,7 +17,7 @@ class LogsCleanup
         $this->priceHistoryLog = $priceHistoryLog;
     }
 
-    public function execute()
+    public function execute(): void
     {
         if (!$this->configuration->isCleanupCronEnabled()) {
             return;

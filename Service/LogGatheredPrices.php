@@ -8,9 +8,9 @@ class LogGatheredPrices
 {
     public function __construct(
         protected \MageSuite\LowestPriceLogger\Helper\Configuration $configuration,
-        protected \MageSuite\LowestPriceLogger\Model\ResourceModel\PriceHistoryStagingLog $priceHistoryStagingLog,
         protected \MageSuite\LowestPriceLogger\Model\FilterOutDuplicates $filterOutDuplicates,
-        protected \Magento\Framework\App\ResourceConnection $resourceConnection
+        protected \Magento\Framework\App\ResourceConnection $resourceConnection,
+        protected \MageSuite\LowestPriceLogger\Model\TableMaintainer $tableMaintainer
     ) {
     }
 
@@ -21,13 +21,24 @@ class LogGatheredPrices
             return;
         }
 
-        if ($this->configuration->isAsyncLoggingEnabled()) {
-            $this->priceHistoryStagingLog->save($prices);
+        $connection = $this->resourceConnection->getConnection();
 
-            return;
+        foreach ($this->groupByWebsite($prices) as $websiteId => $websitePrices) {
+            $connection->insertOnDuplicate(
+                $this->tableMaintainer->getTableNameForWebsite($websiteId),
+                $this->tableMaintainer->stripWebsiteId($websitePrices),
+                []
+            );
+        }
+    }
+
+    protected function groupByWebsite(array $prices): array
+    {
+        $grouped = [];
+        foreach ($prices as $price) {
+            $grouped[(int) $price['website_id']][] = $price;
         }
 
-        $connection = $this->resourceConnection->getConnection();
-        $connection->insertOnDuplicate($connection->getTableName('price_history_log'), $prices, []);
+        return $grouped;
     }
 }
