@@ -73,20 +73,4 @@ class TableMaintainerTest extends \PHPUnit\Framework\TestCase
         );
     }
 
-    public function testStripWebsiteIdRemovesKeyFromAllPriceRecords(): void
-    {
-        $prices = [
-            ['product_id' => 1, 'website_id' => 2, 'price' => 9.99, 'log_date' => '2024-01-01'],
-            ['product_id' => 2, 'website_id' => 3, 'price' => 14.99, 'log_date' => '2024-01-01'],
-        ];
-
-        $result = $this->tableMaintainer->stripWebsiteId($prices);
-
-        $this->assertCount(2, $result);
-        foreach ($result as $row) {
-            $this->assertArrayNotHasKey('website_id', $row);
-            $this->assertArrayHasKey('product_id', $row);
-            $this->assertArrayHasKey('price', $row);
-        }
-    }
 }

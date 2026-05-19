@@ -9,6 +9,7 @@ class MigratePriceHistoryToWebsiteTables implements \Magento\Framework\Setup\Pat
     protected const COLUMNS = [
         'customer_group_id',
         'product_id',
+        'website_id',
         'price_type',
         'price',
         'log_date',
@@ -27,10 +28,11 @@ class MigratePriceHistoryToWebsiteTables implements \Magento\Framework\Setup\Pat
         $connection = $this->resourceConnection->getConnection();
         $sourceTable = $connection->getTableName('price_history_log');
 
-        try {
-            foreach ($this->storeManager->getWebsites() as $website) {
-                $websiteId = (int) $website->getId();
+        foreach ($this->storeManager->getWebsites() as $website) {
+            $websiteId = (int) $website->getId();
+            $connection->beginTransaction();
 
+            try {
                 $select = $connection->select()
                     ->from($sourceTable, self::COLUMNS)
                     ->where('website_id = ?', $websiteId);
@@ -41,9 +43,13 @@ class MigratePriceHistoryToWebsiteTables implements \Magento\Framework\Setup\Pat
                     self::COLUMNS,
                     \Magento\Framework\DB\Adapter\AdapterInterface::INSERT_IGNORE
                 ));
+
+                $connection->delete($sourceTable, ['website_id = ?' => $websiteId]);
+                $connection->commit();
+            } catch (\Throwable $e) {
+                $connection->rollBack();
+                throw $e;
             }
-        } catch (\Throwable $e) {
-            throw $e;
         }
 
         return $this;

@@ -6,7 +6,8 @@ namespace MageSuite\LowestPriceLogger\Model;
 
 class TableMaintainer
 {
-    public const TEMPLATE_TABLE = 'price_history_log_website';
+    public const TEMPLATE_TABLE = 'price_history_log';
+    public const WEBSITE_TABLE_PREFIX = 'price_history_log_website';
 
     public function __construct(
         protected \Magento\Framework\App\ResourceConnection $resourceConnection,
@@ -16,7 +17,7 @@ class TableMaintainer
 
     public function getTableNameForWebsite(int $websiteId): string
     {
-        return $this->resourceConnection->getTableName(self::TEMPLATE_TABLE . '_' . $websiteId);
+        return $this->resourceConnection->getTableName(self::WEBSITE_TABLE_PREFIX . '_' . $websiteId);
     }
 
     public function getTemplateTableName(): string
@@ -39,11 +40,6 @@ class TableMaintainer
         foreach ($this->storeManager->getWebsites() as $website) {
             $this->createTableForWebsite((int) $website->getId());
         }
-    }
-
-    public function stripWebsiteId(array $prices): array
-    {
-        return array_map(fn(array $price) => array_diff_key($price, ['website_id' => null]), $prices);
     }
 
     protected function createTable(string $templateTable, string $targetTable): void

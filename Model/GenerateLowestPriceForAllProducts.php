@@ -81,7 +81,7 @@ class GenerateLowestPriceForAllProducts
 
             $this->connection->insertOnDuplicate(
                 $this->tableMaintainer->getTableNameForWebsite($websiteId),
-                $this->tableMaintainer->stripWebsiteId($prices),
+                $prices,
                 []
             );
         }

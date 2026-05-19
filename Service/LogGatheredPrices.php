@@ -26,7 +26,7 @@ class LogGatheredPrices
 
             $connection->insertOnDuplicate(
                 $this->tableMaintainer->getTableNameForWebsite($websiteId),
-                $this->tableMaintainer->stripWebsiteId($websitePrices),
+                $websitePrices,
                 []
             );
         }

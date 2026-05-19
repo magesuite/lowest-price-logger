@@ -20,7 +20,7 @@ class PriceHistoryLog extends \Magento\Framework\Model\ResourceModel\Db\Abstract
 
     protected function _construct(): void
     {
-        $this->_init('price_history_log_website', 'log_id');
+        $this->_init('price_history_log', 'log_id');
     }
 
     public function getPriceHistory(array $productIds, int $websiteId, ?int $customerGroupId = null): array
@@ -114,7 +114,7 @@ class PriceHistoryLog extends \Magento\Framework\Model\ResourceModel\Db\Abstract
     {
         $grouped = [];
         foreach ($prices as $price) {
-            $grouped[(int) $price['website_id']][] = array_diff_key($price, ['website_id' => null]);
+            $grouped[(int) $price['website_id']][] = $price;
         }
 
         foreach ($grouped as $wId => $websitePrices) {
