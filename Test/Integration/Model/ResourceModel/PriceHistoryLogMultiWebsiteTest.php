@@ -169,14 +169,17 @@ class PriceHistoryLogMultiWebsiteTest extends \PHPUnit\Framework\TestCase
             ],
         ]);
 
-        $result = $this->priceHistoryLog->getLastPricesPerProduct([(int) $product->getId()]);
-
         $productKey = (string) $product->getId();
-        $this->assertArrayHasKey($productKey, $result);
-        $this->assertArrayHasKey($defaultWebsiteId, $result[$productKey]['0']);
-        $this->assertArrayHasKey($secondWebsiteId, $result[$productKey]['0']);
-        $this->assertEquals(10.00, $result[$productKey]['0'][$defaultWebsiteId]['0']);
-        $this->assertEquals(8.00, $result[$productKey]['0'][$secondWebsiteId]['0']);
+
+        $defaultResult = $this->priceHistoryLog->getLastPricesPerProduct([(int) $product->getId()], $defaultWebsiteId);
+        $this->assertArrayHasKey($productKey, $defaultResult);
+        $this->assertArrayHasKey($defaultWebsiteId, $defaultResult[$productKey]['0']);
+        $this->assertEquals(10.00, $defaultResult[$productKey]['0'][$defaultWebsiteId]['0']);
+
+        $secondResult = $this->priceHistoryLog->getLastPricesPerProduct([(int) $product->getId()], $secondWebsiteId);
+        $this->assertArrayHasKey($productKey, $secondResult);
+        $this->assertArrayHasKey($secondWebsiteId, $secondResult[$productKey]['0']);
+        $this->assertEquals(8.00, $secondResult[$productKey]['0'][$secondWebsiteId]['0']);
     }
 
     protected function countRowsInWebsiteTable(int $websiteId): int

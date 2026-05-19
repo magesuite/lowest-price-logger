@@ -66,31 +66,22 @@ class PriceHistoryLog extends \Magento\Framework\Model\ResourceModel\Db\Abstract
         return is_array($price) ? $price : [];
     }
 
-    public function getLastPricesPerProduct(
-        array $productIds,
-        ?int $websiteId = null,
-        ?int $customerGroupId = null
-    ): array {
-        $websiteIds = $websiteId !== null
-            ? [$websiteId]
-            : array_map(fn($website) => (int) $website->getId(), $this->storeManager->getWebsites());
-
+    public function getLastPricesPerProduct(array $productIds, int $websiteId, ?int $customerGroupId = null): array
+    {
         $pricesToCompare = [];
 
-        foreach ($websiteIds as $wId) {
-            $select = $this->getConnection()->select()
-                ->from($this->tableMaintainer->getTableNameForWebsite($wId))
-                ->where('product_id IN(?)', $productIds)
-                ->group(['product_id', 'customer_group_id', 'price_type'])
-                ->order(['log_date DESC', 'log_id DESC']);
+        $select = $this->getConnection()->select()
+            ->from($this->tableMaintainer->getTableNameForWebsite($websiteId))
+            ->where('product_id IN(?)', $productIds)
+            ->group(['product_id', 'customer_group_id', 'price_type'])
+            ->order(['log_date DESC', 'log_id DESC']);
 
-            if ($customerGroupId !== null) {
-                $select->where('customer_group_id = ?', $customerGroupId);
-            }
+        if ($customerGroupId !== null) {
+            $select->where('customer_group_id = ?', $customerGroupId);
+        }
 
-            foreach ($this->getConnection()->fetchAll($select) as $price) {
-                $pricesToCompare[$price['product_id']][$price['customer_group_id']][$wId][$price['price_type']] = $price['price'];
-            }
+        foreach ($this->getConnection()->fetchAll($select) as $price) {
+            $pricesToCompare[$price['product_id']][$price['customer_group_id']][$websiteId][$price['price_type']] = $price['price'];
         }
 
         return $pricesToCompare;

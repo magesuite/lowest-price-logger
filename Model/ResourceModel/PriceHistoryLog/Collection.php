@@ -21,7 +21,7 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
     protected function _construct(): void
     {
         $this->_init(
-            \Magento\Framework\DataObject::class,
+            \MageSuite\LowestPriceLogger\Model\PriceHistoryLog::class,
             \MageSuite\LowestPriceLogger\Model\ResourceModel\PriceHistoryLog::class
         );
     }

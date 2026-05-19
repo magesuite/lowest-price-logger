@@ -11,7 +11,7 @@ class FilterOutDuplicates
         $this->priceHistoryLog = $priceHistoryLog;
     }
 
-    public function execute(array $prices, ?int $websiteId = null, ?int $customerGroupId = null): array
+    public function execute(array $prices, int $websiteId, ?int $customerGroupId = null): array
     {
         if (empty($prices)) {
             return [];
