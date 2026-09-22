@@ -17,6 +17,7 @@ class GenerateLowestPriceForAllProducts
     protected GetCurrentDate $getCurrentDate;
     protected \Magento\Customer\Model\GroupManagement $groupManagement;
     protected \MageSuite\LowestPriceLogger\Helper\Configuration $configuration;
+    protected \MageSuite\LowestPriceLogger\Model\TableMaintainer $tableMaintainer;
     protected ?array $customerGroups = null;
     protected AddCatalogRulePricesToCollection $addCatalogRulePricesToCollection;
 
@@ -29,7 +30,8 @@ class GenerateLowestPriceForAllProducts
         GetCurrentDate $getCurrentDate,
         \Magento\Customer\Model\GroupManagement $groupManagement,
         \MageSuite\LowestPriceLogger\Helper\Configuration $configuration,
-        AddCatalogRulePricesToCollection $addCatalogRulePricesToCollection
+        AddCatalogRulePricesToCollection $addCatalogRulePricesToCollection,
+        \MageSuite\LowestPriceLogger\Model\TableMaintainer $tableMaintainer
     ) {
         $this->productCollectionFactory = $productCollectionFactory;
         $this->customerSession = $customerSession;
@@ -40,6 +42,7 @@ class GenerateLowestPriceForAllProducts
         $this->groupManagement = $groupManagement;
         $this->configuration = $configuration;
         $this->addCatalogRulePricesToCollection = $addCatalogRulePricesToCollection;
+        $this->tableMaintainer = $tableMaintainer;
     }
 
     public function execute(): void
@@ -77,7 +80,7 @@ class GenerateLowestPriceForAllProducts
             }
 
             $this->connection->insertOnDuplicate(
-                $this->connection->getTableName('price_history_log'),
+                $this->tableMaintainer->getTableNameForWebsite($websiteId),
                 $prices,
                 []
             );
@@ -132,8 +135,10 @@ class GenerateLowestPriceForAllProducts
 
                 $priceInfo = $product->getPriceInfo();
 
-                if ($product->getTypeId() == \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE
-                    && $product->getPriceType() == \Magento\Bundle\Model\Product\Price::PRICE_TYPE_DYNAMIC) {
+                if (
+                    $product->getTypeId() == \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE
+                    && $product->getPriceType() == \Magento\Bundle\Model\Product\Price::PRICE_TYPE_DYNAMIC
+                ) {
                     $finalPrice = $regularPrice = (float) $product->getPriceInfo()
                         ->getPrice(\Magento\Catalog\Pricing\Price\FinalPrice::PRICE_CODE)
                         ->getAmount()

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MageSuite\LowestPriceLogger\Cron;
 
 class LogPrices
@@ -15,7 +17,7 @@ class LogPrices
         $this->generateLowestPriceForAllProductsFactory = $generateLowestPriceForAllProductsFactory;
     }
 
-    public function execute()
+    public function execute(): void
     {
         if (!$this->configuration->isCalculationCronEnabled()) {
             return;

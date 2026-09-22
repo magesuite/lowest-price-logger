@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace MageSuite\LowestPriceLogger\Ui\Component\Listing\Column;
 
 class Website extends \Magento\Ui\Component\Listing\Columns\Column
@@ -18,7 +20,7 @@ class Website extends \Magento\Ui\Component\Listing\Columns\Column
         $this->websiteRepository = $websiteRepository;
     }
 
-    public function prepareDataSource(array $dataSource)
+    public function prepareDataSource(array $dataSource): array
     {
         if (!isset($dataSource['data']['items'])) {
             return $dataSource;
